@@ -80,9 +80,9 @@ def process(yaml_file, plot_all=False):
 
     # motor_vel vs time ------------------------------------------------------
     fig2, axs = plt.subplots()
-    #l0 = axs.plot([s/1e9 for s in ns], i_fb, color='#8e8e8e', marker='.', markersize=0.2, linestyle="", label='current out fb (A)')
+    l0 = axs.plot([s/1e9 for s in ns], i_fb, color='#8e8e8e', marker='.', markersize=0.2, linestyle="", label='current out fb (A)')
     l1 = axs.plot([s/1e9 for s in ns], i_q, color='#1e1e1e', marker='.', markersize=0.2, linestyle="-", label='current reference (A)')
-    l2 = axs.plot([s/1e9 for s in ns], i_fb, color='#2ca02c', marker='.', markersize=0.2, linestyle=":", label='current ref fb (A)')
+    # l2 = axs.plot([s/1e9 for s in ns], i_fb, color='#2ca02c', marker='.', markersize=0.2, linestyle=":", label='current ref fb (A)')
     l3 = axs.plot([s/1e9 for s in ns], [float(v)/1e3 for v in motor_vel], color='#1f77b4', marker='.', markersize=0.2, label='motor velocity (rad/s)')
     axs.legend()
     for l in t_steps:
@@ -108,9 +108,9 @@ def process(yaml_file, plot_all=False):
 
     # motor_vel vs i_q ------------------------------------------------------
     fig, axs = plt.subplots()
-    # l0 = axs.plot(i_fb,  motor_vel, color='#8e8e8e', marker='.', markersize=0.2, linestyle="", label='current out fb (A)')
+    l0 = axs.plot(i_fb,  motor_vel, color='#8e8e8e', marker='.', markersize=0.2, linestyle="", label='current out fb (A)')
     l1 = axs.plot(i_q, motor_vel, color='#1e1e1e', marker='.', markersize=0.2, linestyle="-", label='current reference (A)')
-    l2 = axs.plot(i_fb,  motor_vel, color='#2ca02c', marker='.', markersize=0.2, linestyle=":", label='current ref fb (A)')
+    # l2 = axs.plot(i_fb,  motor_vel, color='#2ca02c', marker='.', markersize=0.2, linestyle=":", label='current ref fb (A)')
     axs.legend()
 
     # make plot pretty
