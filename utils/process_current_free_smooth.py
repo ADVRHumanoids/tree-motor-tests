@@ -85,10 +85,11 @@ def process(yaml_file, plot_all=False):
 
     # motor_vel vs time ------------------------------------------------------
     fig2, axs = plt.subplots()
+    v=[float(v)/1e3 for v in motor_vel]
     l0 = axs.plot([s/1e9 for s in ns], i_fb, color='#8e8e8e', marker='.', markersize=0.2, linestyle="", label='current out fb (A)')
     l1 = axs.plot([s/1e9 for s in ns], i_q, color='#1e1e1e', marker='.', markersize=0.2, linestyle="-", label='current reference (A)')
     # l2 = axs.plot([s/1e9 for s in ns], i_fb, color='#2ca02c', marker='.', markersize=0.2, linestyle=":", label='current ref fb (A)')
-    l3 = axs.plot([s/1e9 for s in ns], [float(v)/1e3 for v in motor_vel], color='#1f77b4', marker='.', markersize=0.2, label='motor velocity (rad/s)')
+    l3 = axs.plot([s/1e9 for s in ns], v, color='#1f77b4', marker='.', markersize=0.2, label='motor velocity (rad/s)')
     axs.legend()
     for l in t_steps:
         axs.axvline(l, linestyle='--', color='r', alpha=0.5, zorder=1)
@@ -96,8 +97,8 @@ def process(yaml_file, plot_all=False):
     # make plot pretty
     axs.set_xlabel('Time (s)')
     axs.set_xlim(ns[0]/1e9, t_steps[-1])
-    plt_max = (max(i_q) -min(i_q)) * 0.05
-    axs.set_ylim(min(i_q)-plt_max, max(i_q)+plt_max)
+    plt_max = (max(max(i_q),max(v)) -min(min(i_q),min(v))) * 0.05
+    axs.set_ylim(min(min(i_q),min(v))-plt_max,max(max(i_q),max(v))+plt_max)
     axs.grid(b=True, which='major', axis='x', linestyle=':')
     axs.grid(b=True, which='major', axis='y', linestyle='-')
     axs.grid(b=True, which='minor', axis='y', linestyle=':')
