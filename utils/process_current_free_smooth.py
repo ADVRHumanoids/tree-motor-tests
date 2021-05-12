@@ -63,14 +63,19 @@ def process(yaml_file, plot_all=False):
         number_of_iters = out_dict['test_current']['number_of_iters']
         rise_time = out_dict['test_current']['rise_time']
         wait_time = out_dict['test_current']['wait_time']
-        t_steps = [ns[0]/1e9 + rise_time]
+        t_steps = [ns[0]/1e9]
+        t_steps.append(t_steps[-1]+rise_time)
+        t_steps.append(t_steps[-1]+rise_time)
         t_steps.append(t_steps[-1]+wait_time)
+        t_steps.append(t_steps[-1]+rise_time)
         t_steps.append(t_steps[-1]+rise_time)
         t_steps.append(t_steps[-1]+wait_time)
         if number_of_iters > 1:
             for n in range(1,number_of_iters):
                 t_steps.append(t_steps[-1]+rise_time)
+                t_steps.append(t_steps[-1]+rise_time)
                 t_steps.append(t_steps[-1]+wait_time)
+                t_steps.append(t_steps[-1]+rise_time)
                 t_steps.append(t_steps[-1]+rise_time)
                 t_steps.append(t_steps[-1]+wait_time)
     else:
