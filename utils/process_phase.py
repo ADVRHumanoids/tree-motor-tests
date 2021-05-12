@@ -50,10 +50,10 @@ def process(yaml_file, plot_all=False):
     image_base_path= new_head +f'{code_string}_phase-calib'
 
     # load params
-    if 'calib_phase' in out_dict:
-        yaml_dict = out_dict['calib_phase']
+    if 'test_phase' in out_dict:
+        yaml_dict = out_dict['test_phase']
     else:
-        raise Exception("missing 'calib_phase' in yaml parsing")
+        raise Exception("missing 'test_phase' in yaml parsing")
     if 'iq_max_repeat_iter' in yaml_dict:
         repeat = yaml_dict['iq_max_repeat_iter']
     if 'iq_number_of_steps' in yaml_dict:
@@ -77,7 +77,7 @@ def process(yaml_file, plot_all=False):
     link_pos  = [    float(x.split('\t')[ 9]) for x in open(log_file).readlines()]
     aux_var   = [    float(x.split('\t')[10]) for x in open(log_file).readlines()]
 
-    print('[i] Processing data')
+    print(f'[i] Processing data (loaded {len(ns)} points)')
     # find where we start testing id instead of iq
     cc = len(curr_type) - 2
     for i in range(1, len(curr_type)):
@@ -85,6 +85,58 @@ def process(yaml_file, plot_all=False):
             # disp('found change of current curr_type')
             cc = i
             break
+
+    # Plot full test --------------------------------------------------------------
+    if plot_all:
+        fig, axs = plt.subplots(2)
+        fig.suptitle('Velocity by current type')
+
+        axs[0].plot(ns[:cc],
+                    motor_vel[:cc],
+                    label='Motor Vel',
+                    color='b',
+                    marker='.')
+        for i in range(1, cc):
+            if (loop_cnt[i] > loop_cnt[i - 1]):
+                axs[0].axvline(ns[i - 1], linestyle='--', color='r')
+            elif (step_cnt[i] > step_cnt[i - 1]):
+                axs[0].axvline(ns[i - 1], linestyle='--', color='g')
+        axs[0].set_title('i_q=  2.5A @ 1.2Hz')
+        axs[0].set_ylabel('motor_vel (rad/s)')
+        axs[0].set_xlabel('timestamp (ns)')
+        axs[0].grid(b=True, which='major', axis='y', linestyle='-')
+        axs[0].grid(b=True, which='minor', axis='y', linestyle=':')
+        axs[0].yaxis.set_major_locator(
+            plt.MultipleLocator((max(motor_vel) - min(motor_vel)) * 1.1 / 4))
+        axs[0].yaxis.set_minor_locator(
+            plt.MultipleLocator((max(motor_vel) - min(motor_vel)) * 1.1 / 12))
+        axs[0].spines['top'].set_visible(False)
+        axs[0].spines['right'].set_visible(False)
+        axs[0].spines['left'].set_visible(False)
+
+        axs[1].plot(ns[cc:],
+                    motor_vel[cc:],
+                    label='Motor Vel',
+                    color='b',
+                    marker='.')
+        for i in range(cc, len(ns)):
+            if (loop_cnt[i] > loop_cnt[i - 1]):
+                axs[1].axvline(ns[i - 1], linestyle='--', color='r')
+            elif (step_cnt[i] > step_cnt[i - 1]):
+                axs[1].axvline(ns[i - 1], linestyle='--', color='g')
+        plt_max = max([max(motor_vel[cc:]), -min(motor_vel[cc:])]) * 1.2
+        axs[1].set_ylim(-plt_max, plt_max)
+        axs[1].set_title('i_d=  10.0A @ 2Hz')
+        axs[1].set_ylabel('motor_vel (rad/s)')
+        axs[1].set_xlabel('timestamp (ns)')
+        axs[1].grid(b=True, which='major', axis='y', linestyle='-')
+        axs[1].grid(b=True, which='minor', axis='y', linestyle=':')
+        axs[1].yaxis.set_major_locator(plt.MultipleLocator(plt_max / 2))
+        axs[1].yaxis.set_minor_locator(plt.MultipleLocator(plt_max / 6))
+        axs[1].spines['top'].set_visible(False)
+        axs[1].spines['right'].set_visible(False)
+        axs[1].spines['left'].set_visible(False)
+        plt.show()
 
     # split trajectories in individual motions -----------------------------------------------------
     trj_v = [
@@ -113,6 +165,30 @@ def process(yaml_file, plot_all=False):
     for i in range(0, len(steps)):
         for j in range(1, len(steps[i])):
             smooth[i][j] = alpha * steps[i][j] + (1 - alpha) * smooth[i][j - 1]
+
+
+
+    # Plot individual trajectories ----------------------------------------------------------------------
+    if plot_all:
+        fig, axs = plt.subplots()
+        fig.suptitle('Individual trajectories')
+        for i in range(0, len(ts)):
+            axs.plot(ts[i], steps[i], label='diff')
+            axs.plot(ts[i], smooth[i], label='diff')
+
+        axs.set_ylabel('motor_vel (mrad/s)')
+        axs.set_xlabel('timestamp (ns)')
+
+        axs.grid(b=True, which='major', axis='y', linestyle='-')
+        axs.grid(b=True, which='minor', axis='y', linestyle=':')
+        axs.yaxis.set_major_locator(
+            plt.MultipleLocator((max(motor_vel) - min(motor_vel)) * 1.1 / 6))
+        axs.yaxis.set_minor_locator(
+            plt.MultipleLocator((max(motor_vel) - min(motor_vel)) * 1.1 / 18))
+        axs.spines['top'].set_visible(False)
+        axs.spines['right'].set_visible(False)
+        axs.spines['left'].set_visible(False)
+        plt.show()
 
     # evaluate performance of each trajectory -----------------------------------------------------------
     score = [[], [], []]
@@ -224,8 +300,6 @@ def process(yaml_file, plot_all=False):
     axs.spines['left'].set_visible(False)
     axs.legend(handles=(l1, l2, l3, l4),
                labels=('Round 1', 'Round 2', 'Fitted curve', 'best ph_angle'))
-    if plot_all:
-        plt.show()
 
     print(plot_utils.bcolors.OKGREEN + u'[\u2713] Result: ph_angle = ' + str(fit_angle) +
           plot_utils.bcolors.ENDC)
@@ -234,6 +308,9 @@ def process(yaml_file, plot_all=False):
     fig_name = image_base_path + '.png'
     print('Saving graph as: ' + fig_name)
     plt.savefig(fname=fig_name, format='png', bbox_inches='tight')
+
+    if plot_all:
+        plt.show()
 
     # Save result
     if 'name' in out_dict['log']:
