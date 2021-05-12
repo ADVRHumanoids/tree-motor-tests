@@ -246,4 +246,4 @@ def process(log_file, plot_all=False):
 
 
 if __name__ == "__main__":
-    yaml_file = process(log_file=sys.argv[1], plot_all=False)
+    process(log_file=sys.argv[1], plot_all=False)
