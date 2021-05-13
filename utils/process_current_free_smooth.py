@@ -28,12 +28,12 @@ def process(yaml_file, plot_all=False):
     if 'location' in out_dict['log']:
         head = out_dict['log']['location']
     else:
-        head, _ =os.path.split(yaml_file)
+        head, _ = os.path.split(yaml_file)
 
     if 'name' in out_dict['log']:
         code_string = out_dict['log']['name']
     else:
-        _, tail =os.path.split(yaml_file)
+        _, tail = os.path.split(yaml_file)
         code_string = tail[:-len("-results.yaml")]
 
     # set path to save graphs
@@ -107,8 +107,8 @@ def process(yaml_file, plot_all=False):
 
     # Save the graph
     fig_name = image_base_path + '_1.png'
-    print('Saving graph as: ' + fig_name)
     plt.savefig(fname=fig_name, format='png', bbox_inches='tight')
+    print('[i] Saved graphSaved graph as: ' + fig_name)
     if plot_all:
         plt.show()
 
@@ -132,8 +132,8 @@ def process(yaml_file, plot_all=False):
 
     # Save the graph
     fig_name = image_base_path + '_2.png'
-    print('Saving graph as: ' + fig_name)
     plt.savefig(fname=fig_name, format='png', bbox_inches='tight')
+    print('[i] Saved graphSaved graph as: ' + fig_name)
     if plot_all:
         plt.show()
 

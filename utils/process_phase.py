@@ -306,7 +306,7 @@ def process(yaml_file, plot_all=False):
 
     # Save the graph
     fig_name = image_base_path + '.png'
-    print('Saving graph as: ' + fig_name)
+    print('[i] Saving graph as: ' + fig_name)
     plt.savefig(fname=fig_name, format='png', bbox_inches='tight')
 
     if plot_all:

@@ -66,8 +66,8 @@ def process(log_file, plot_all=False):
 
     # Save the graph
     fig_name = image_base_path + '_pos.png'
-    print('Saving graph: ' + fig_name)
     plt.savefig(fname=fig_name, format='png', bbox_inches='tight')
+    print('[i] Saved graph: ' + fig_name)
     if plot_all:
         plt.show()
 
@@ -89,8 +89,8 @@ def process(log_file, plot_all=False):
 
     # Save the graph
     fig_name = image_base_path + '_vel.png'
-    print('Saving graph: ' + fig_name)
     plt.savefig(fname=fig_name, format='png', bbox_inches='tight')
+    print('[i] Saved graph: ' + fig_name)
     if plot_all:
         plt.show()
 
@@ -110,8 +110,8 @@ def process(log_file, plot_all=False):
 
     # Save the graph
     fig_name = image_base_path + '_torque.png'
-    print('Saving graph: ' + fig_name)
     plt.savefig(fname=fig_name, format='png', bbox_inches='tight')
+    print('[i] Saved graph: ' + fig_name)
     if plot_all:
         plt.show()
 
@@ -133,8 +133,8 @@ def process(log_file, plot_all=False):
 
     # Save the graph
     fig_name = image_base_path + '_temp.png'
-    print('Saving graph: ' + fig_name)
     plt.savefig(fname=fig_name, format='png', bbox_inches='tight')
+    print('[i] Saved graph: ' + fig_name)
     if plot_all:
         plt.show()
 
@@ -154,8 +154,8 @@ def process(log_file, plot_all=False):
 
     # Save the graph
     fig_name = image_base_path + '_fault.png'
-    print('Saving graph: ' + fig_name)
     plt.savefig(fname=fig_name, format='png', bbox_inches='tight')
+    print('[i] Saved graph: ' + fig_name)
     if plot_all:
         plt.show()
 
@@ -175,8 +175,8 @@ def process(log_file, plot_all=False):
 
     # Save the graph
     fig_name = image_base_path + '_rtt.png'
-    print('Saving graph: ' + fig_name)
     plt.savefig(fname=fig_name, format='png', bbox_inches='tight')
+    print('[i] Saved graph: ' + fig_name)
     if plot_all:
         plt.show()
 
@@ -197,8 +197,8 @@ def process(log_file, plot_all=False):
 
     # Save the graph
     fig_name = image_base_path + '_rtt-zoomed.png'
-    print('Saving graph: ' + fig_name)
     plt.savefig(fname=fig_name, format='png', bbox_inches='tight')
+    print('[i] Saved graph: ' + fig_name)
     if plot_all:
         plt.show()
 
@@ -218,8 +218,8 @@ def process(log_file, plot_all=False):
 
     # Save the graph
     fig_name = image_base_path + '_op_idx_ack.png'
-    print('Saving graph: ' + fig_name)
     plt.savefig(fname=fig_name, format='png', bbox_inches='tight')
+    print('[i] Saved graph: ' + fig_name)
     if plot_all:
         plt.show()
 
@@ -239,8 +239,8 @@ def process(log_file, plot_all=False):
 
     # Save the graph
     fig_name = image_base_path + '_aux.png'
-    print('Saving graph: ' + fig_name)
     plt.savefig(fname=fig_name, format='png', bbox_inches='tight')
+    print('[i] Saved graph: ' + fig_name)
     if plot_all:
         plt.show()
 
