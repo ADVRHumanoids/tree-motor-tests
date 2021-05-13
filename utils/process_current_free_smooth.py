@@ -29,6 +29,11 @@ def process(yaml_file, plot_all=False):
         _, tail = os.path.split(yaml_file)
         code_string = tail[:-len("-results.yaml")]
 
+    if 'test_type' in out_dict['test_current']:
+        test_type = out_dict['test_current']['test_type']
+    else:
+        test_type = "ramp"
+
     # set path to save graphs
     if len(head)>6 and head[-6:]=='/logs/':
         new_head = f'{head[:-6]}/images/'
@@ -40,9 +45,9 @@ def process(yaml_file, plot_all=False):
             os.makedirs(new_head)
         except OSError:
             print("Creation of the directory %s failed" % new_head)
-    image_base_path= new_head +f'{code_string}_test-current-free-smooth'
+    image_base_path = new_head +f'{code_string}_test-current-free-{test_type}'
 
-    log_file=head+f'{code_string}_test-current-free-smooth.log'
+    log_file = head + f'{code_string}_test-current-free-{test_type}.log'
     print('[i] Reading log_file: ' + log_file)
 
     # log format: '%u64\t%u\t%u\t%u\t%u\t%f\t%f\t%d\t%f\t%f\t%f'
