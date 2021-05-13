@@ -2,19 +2,12 @@
 
 import os
 import sys
-import glob
 import yaml
 import numpy as np
 from matplotlib import pyplot as plt
 
-#import costum
-from utils import plot_utils
-
 def process(yaml_file, plot_all=False):
     plt.rcParams['savefig.dpi'] = 300
-    repeat = 3
-    steps_1 = 13
-    steps_2 = 6
 
     # read parameters from yaml file
     print('[i] Using yaml_file: ' + yaml_file)
@@ -84,7 +77,7 @@ def process(yaml_file, plot_all=False):
     print(f'[i] Processing data (loaded {len(ns)} points)')
 
     # motor_vel vs time ------------------------------------------------------
-    fig2, axs = plt.subplots()
+    fig, axs = plt.subplots()
     v=[float(v)/1e3 for v in motor_vel]
     l0 = axs.plot([s/1e9 for s in ns], i_fb, color='#8e8e8e', marker='.', markersize=0.2, linestyle="", label='current out fb (A)')
     l1 = axs.plot([s/1e9 for s in ns], i_q, color='#1e1e1e', marker='.', markersize=0.2, linestyle="-", label='current reference (A)')
@@ -140,6 +133,7 @@ def process(yaml_file, plot_all=False):
     return yaml_file
 
 if __name__ == "__main__":
+    import plot_utils
     plot_utils.print_alberobotics()
     print(plot_utils.bcolors.OKBLUE + "[i] Starting process_current_free_smooth" + plot_utils.bcolors.ENDC)
     yaml_file = process(yaml_file=sys.argv[1], plot_all=False)
