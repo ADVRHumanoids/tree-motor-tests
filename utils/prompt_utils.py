@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin python3
 # -*- coding: utf-8 -*-
 """Function to interact with the user"""
 

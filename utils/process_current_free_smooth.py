@@ -1,9 +1,13 @@
-#!/usr/bin/python3
+#!/usr/bin python3
+# -*- coding: utf-8 -*-
 
 import os
 import sys
 import yaml
 import numpy as np
+# tell matplotlib not to try to load up GTK as it returns errors over ssh
+from matplotlib import use as plt_use
+plt_use("Agg")
 from matplotlib import pyplot as plt
 
 def process(yaml_file, plot_all=False):
@@ -94,7 +98,7 @@ def process(yaml_file, plot_all=False):
 
     # make plot pretty
     axs.set_xlabel('Time (s)')
-    axs.set_xlim(ns[0]/1e9, t_steps[-1])
+    axs.set_xlim(ns[0]/1e9, ns[-1]/1e9)
     plt_max = (max(max(i_q),max(v)) -min(min(i_q),min(v))) * 0.05
     axs.set_ylim(min(min(i_q),min(v))-plt_max,max(max(i_q),max(v))+plt_max)
     axs.grid(b=True, which='major', axis='x', linestyle=':')
