@@ -33,8 +33,8 @@ def process(yaml_file, plot_all=False):
         _, tail = os.path.split(yaml_file)
         code_string = tail[:-len("-results.yaml")]
 
-    if 'test_type' in out_dict['test_current_free']:
-        test_type = out_dict['test_current_free']['test_type']
+    if 'test_type' in out_dict['test_current_locked']:
+        test_type = out_dict['test_current_locked']['test_type']
     else:
         test_type = "ramp"
 
@@ -49,22 +49,21 @@ def process(yaml_file, plot_all=False):
             os.makedirs(new_head)
         except OSError:
             print("Creation of the directory %s failed" % new_head)
-    image_base_path = new_head +f'{code_string}_test-current-free-{test_type}'
+    image_base_path = new_head +f'{code_string}_test-current-locked-{test_type}'
 
-    log_file = head + f'{code_string}_test-current-free-{test_type}.log'
+    log_file = head + f'{code_string}_test-current-locked-{test_type}.log'
     print('[i] Reading log_file: ' + log_file)
 
     # log format: '%u64\t%u\t%u\t%u\t%u\t%f\t%f\t%d\t%f\t%f\t%f'
     ns        = [np.uint64(x.split('\t')[0]) for x in open(log_file).readlines()]
-    motor_pos = [    float(x.split('\t')[1]) for x in open(log_file).readlines()]
-    motor_vel = [ np.int16(x.split('\t')[2]) for x in open(log_file).readlines()]
-    i_q       = [    float(x.split('\t')[3]) for x in open(log_file).readlines()]
-    i_fb      = [    float(x.split('\t')[4]) for x in open(log_file).readlines()]
+    motor_tor = [    float(x.split('\t')[1]) for x in open(log_file).readlines()]
+    i_q       = [    float(x.split('\t')[2]) for x in open(log_file).readlines()]
+    i_fb      = [    float(x.split('\t')[3]) for x in open(log_file).readlines()]
 
-    if 'test_current_free' in out_dict:
-        number_of_iters = out_dict['test_current_free']['number_of_iters']
-        rise_time = out_dict['test_current_free']['rise_time']
-        wait_time = out_dict['test_current_free']['wait_time']
+    if 'test_current_locked' in out_dict:
+        number_of_iters = out_dict['test_current_locked']['number_of_iters']
+        rise_time = out_dict['test_current_locked']['rise_time']
+        wait_time = out_dict['test_current_locked']['wait_time']
         t_steps = [ns[0]/1e9]
         t_steps.append(t_steps[-1]+rise_time)
         t_steps.append(t_steps[-1]+rise_time)
@@ -81,26 +80,28 @@ def process(yaml_file, plot_all=False):
                 t_steps.append(t_steps[-1]+rise_time)
                 t_steps.append(t_steps[-1]+wait_time)
     else:
-        raise Exception("missing 'test_current_free' in yaml parsing")
+        raise Exception("missing 'test_current_locked' in yaml parsing")
 
     print(f'[i] Processing data (loaded {len(ns)} points)')
 
     # motor_vel vs time ------------------------------------------------------
     fig, axs = plt.subplots()
-    v=[float(v)/1e3 for v in motor_vel]
     l0 = axs.plot([s/1e9 for s in ns], i_fb, color='#8e8e8e', marker='.', markersize=0.2, linestyle="", label='current out fb (A)')
     l1 = axs.plot([s/1e9 for s in ns], i_q, color='#1e1e1e', marker='.', markersize=0.2, linestyle="-", label='current reference (A)')
     # l2 = axs.plot([s/1e9 for s in ns], i_fb, color='#2ca02c', marker='.', markersize=0.2, linestyle=":", label='current ref fb (A)')
-    l3 = axs.plot([s/1e9 for s in ns], v, color='#1f77b4', marker='.', markersize=0.2, label='motor velocity (rad/s)')
-    axs.legend()
+    l3 = axs.plot([s/1e9 for s in ns], motor_tor, color='#1f77b4', marker='.', markersize=0.2, label='motor torque (Nm)')
+    lgnd = axs.legend()
+    for handle in lgnd.legendHandles:
+        handle._legmarker.set_markersize(6)
+
     for l in t_steps:
         axs.axvline(l, linestyle='--', color='r', alpha=0.5, zorder=1)
 
     # make plot pretty
     axs.set_xlabel('Time (s)')
     axs.set_xlim(ns[0]/1e9, ns[-1]/1e9)
-    plt_max = (max(max(i_q),max(v)) -min(min(i_q),min(v))) * 0.05
-    axs.set_ylim(min(min(i_q),min(v))-plt_max,max(max(i_q),max(v))+plt_max)
+    plt_max = (max(max(i_q),max(motor_tor)) -min(min(i_q),min(motor_tor))) * 0.05
+    axs.set_ylim(min(min(i_q),min(motor_tor))-plt_max,max(max(i_q),max(motor_tor))+plt_max)
     axs.grid(b=True, which='major', axis='x', linestyle=':')
     axs.grid(b=True, which='major', axis='y', linestyle='-')
     axs.grid(b=True, which='minor', axis='y', linestyle=':')
@@ -116,14 +117,16 @@ def process(yaml_file, plot_all=False):
 
     # motor_vel vs i_q ------------------------------------------------------
     fig, axs = plt.subplots()
-    l0 = axs.plot(i_fb,  motor_vel, color='#8e8e8e', marker='.', markersize=0.2, linestyle="", label='current out fb (A)')
-    l1 = axs.plot(i_q, motor_vel, color='#1e1e1e', marker='.', markersize=0.2, linestyle="-", label='current reference (A)')
+    l0 = axs.plot(i_fb,  motor_tor, color='#8e8e8e', marker='.', markersize=0.2, linestyle="", label='current out fb (A)')
+    l1 = axs.plot(i_q, motor_tor, color='#1e1e1e', marker='.', markersize=0.2, linestyle="-", label='current reference (A)')
     # l2 = axs.plot(i_fb,  motor_vel, color='#2ca02c', marker='.', markersize=0.2, linestyle=":", label='current ref fb (A)')
-    axs.legend()
+    lgnd = axs.legend()
+    for handle in lgnd.legendHandles:
+        handle._legmarker.set_markersize(6)
 
     # make plot pretty
     axs.set_xlabel('Current (A)')
-    axs.set_ylabel('motor velocity (mrad/s)')
+    axs.set_ylabel('motor torque (Nm)')
     plt_max = (max(i_q) -min(i_q)) * 0.05
     axs.set_xlim(min(i_q)-plt_max, max(i_q)+plt_max)
     axs.grid(b=True, which='major', axis='x', linestyle=':')
