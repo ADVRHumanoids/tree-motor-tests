@@ -5,10 +5,17 @@ import os
 import sys
 import yaml
 import numpy as np
-# tell matplotlib not to try to load up GTK as it returns errors over ssh
-from matplotlib import use as plt_use
-plt_use("Agg")
-from matplotlib import pyplot as plt
+
+#import costum
+try:
+    from utils import plot_utils
+    from matplotlib import pyplot as plt
+except ImportError:
+    import plot_utils
+    # tell matplotlib not to try to load up GTK as it returns errors over ssh
+    from matplotlib import use as plt_use
+    plt_use("Agg")
+    from matplotlib import pyplot as plt
 
 def process(yaml_file, plot_all=False):
     plt.rcParams['savefig.dpi'] = 300
@@ -153,7 +160,6 @@ def process(yaml_file, plot_all=False):
     return yaml_file
 
 if __name__ == "__main__":
-    import plot_utils
     plot_utils.print_alberobotics()
     print(plot_utils.bcolors.OKBLUE + "[i] Starting process_current_free_smooth" + plot_utils.bcolors.ENDC)
     yaml_file = process(yaml_file=sys.argv[1], plot_all=False)

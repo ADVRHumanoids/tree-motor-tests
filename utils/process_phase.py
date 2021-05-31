@@ -6,10 +6,17 @@ import sys
 import glob
 import yaml
 import numpy as np
-from matplotlib import pyplot as plt
 
 #import costum
-from utils import plot_utils
+try:
+    from utils import plot_utils
+    from matplotlib import pyplot as plt
+except ImportError:
+    import plot_utils
+    # tell matplotlib not to try to load up GTK as it returns errors over ssh
+    from matplotlib import use as plt_use
+    plt_use("Agg")
+    from matplotlib import pyplot as plt
 
 def process(yaml_file, plot_all=False):
     plt.rcParams['savefig.dpi'] = 300
