@@ -6,8 +6,13 @@ import sys
 import glob
 import yaml
 
-from utils import plot_utils
 from datetime import datetime
+
+#import costum
+try:
+    from utils import plot_utils
+except ImportError:
+    import plot_utils
 
 def move_yaml(yaml_file):
     # read parameters from yaml file
