@@ -77,8 +77,14 @@ def process(yaml_file, plot_all=False):
     gear_ratio = float(out_dict['results']['flash_params']['Motor_gear_ratio'])
 
     print(f'[i] Processing data (loaded {len(ns)} points)')
-    print(f"\ttorque_const: {torque_const}\n\tgear_ratio:   {gear_ratio}")
+    print(f"    torque_const: {torque_const}\n    gear_ratio:   {gear_ratio}")
 
+    # filter current and torque
+    from scipy import signal
+    b,a = signal.butter(2, 0.001, btype='lowpass')
+    # padlen is needed: see https://dsp.stackexchange.com/questions/11466/#47945
+    i_q_filt = signal.filtfilt(b,a, i_q, padlen=3*(max(len(b),len(a))-1))
+    torque_filt = signal.filtfilt(b,a, torque, padlen=3*(max(len(b),len(a))-1))
 
     # motor_vel vs time ------------------------------------------------------
     fig, axs = plt.subplots()
@@ -110,33 +116,27 @@ def process(yaml_file, plot_all=False):
     if plot_all:
         plt.show()
 
-    # motor_vel vs motor_pos ------------------------------------------------------
+    # motor_vel vs time ------------------------------------------------------
     fig, axs = plt.subplots()
-    l0 = axs.plot(real_pos, i_q, color='#8e8e8e', marker='.', markersize=0.2, linestyle="", label='current out fb (A)')
-    l1 = axs.plot(real_pos, ref_vel, color='#1e1e1e', marker='.', markersize=0.2, linestyle="", label='velocity reference (rad/s)')
-    #l2 = axs.plot([s/1e9 for s in ns], i_q, color='#2ca02c', marker='.', markersize=0.2, linestyle=":", label='current ref fb (A)')
-    #l3 = axs.plot(real_pos, motor_vel, color='#1f77b4', marker='.', markersize=0.2, linestyle="", label='motor velocity (rad/s)')
-    for i in range(1,len(step_ids)):
-        if ref_vel[step_ids[i-1]]!=ref_vel[0]:
-            axs.plot(real_pos[step_ids[i-1]:step_ids[i]], motor_vel[step_ids[i-1]:step_ids[i]], marker='.', markersize=0.5, linestyle="", label=f'motor velocity for ref: {ref_vel[step_ids[i-1]]:5.2f} rad/s')
-    lgnd = axs.legend()
+    l0 = axs.plot([s/1e9 for s in ns], [i*torque_const*gear_ratio for i in i_q_filt], color='#8e8e8e', marker='.', markersize=0.2, linestyle="", label='current_ref_fb*motorTorqueConstant*Motor_gear_ratio')
+    l1 = axs.plot([s/1e9 for s in ns], torque_filt, color='#1e1e1e', marker='.', markersize=0.2, linestyle="", label='Torque sensor reading')
+    lgnd = axs.legend(loc='upper left')
     for handle in lgnd.legendHandles:
         handle._legmarker.set_markersize(6)
 
+    for l in step_ids:
+        axs.axvline(ns[l]/1e9, linestyle='--', color='r', alpha=0.5, zorder=1)
+    axs.axvline(ns[-1]/1e9, linestyle='--', color='r', alpha=0.5, zorder=1)
+
     # make plot pretty
-    axs.set_xlabel('Position (rad)')
-    axs.set_xlim(min(real_pos), max(real_pos))
-    axs.set_ylim(-2.5, 2.5)
+    axs.set_xlabel('Time (s)')
+    axs.set_ylabel('motor torque (Nm)')
+    axs.set_xlim(ns[0]/1e9, ns[-1]/1e9)
+    plt_max = (max(torque) -min(torque)) * 0.05
+    axs.set_ylim(min(torque)-plt_max,max(torque)+plt_max)
     axs.grid(b=True, which='major', axis='x', linestyle=':')
     axs.grid(b=True, which='major', axis='y', linestyle='-')
     axs.grid(b=True, which='minor', axis='y', linestyle=':')
-    axs.xaxis.set_major_locator(plt.MultipleLocator(np.pi / 2))
-    axs.xaxis.set_minor_locator(plt.MultipleLocator(np.pi / 6))
-    axs.xaxis.set_major_formatter(
-        plt.FuncFormatter(
-            plot_utils.multiple_formatter(denominator=4,
-                                          number=np.pi,
-                                          latex='\pi')))
     axs.spines['top'].set_visible(False)
     axs.spines['right'].set_visible(False)
 
@@ -157,7 +157,7 @@ def process(yaml_file, plot_all=False):
             i_end.append(step_ids[i])
             v_ref.append(ref_vel[step_ids[i-1]])
 
-    print(f"int(len(i_start)/2): {int(len(i_start)/2)}, int(len(i_start)%2: {int(len(i_start)%2)}")
+    print(f"[i] Fitting sensor reading vs i_q*torque_const*gear_ratio")
     fig, axs = plt.subplots(int(len(i_start)/2), 2)
 
     def linear_func(p, x):
@@ -167,8 +167,8 @@ def process(yaml_file, plot_all=False):
     for i in range(0,len(i_start)):
         id=int(i/2)
         odr_linear = odr.Model(linear_func)
-        tor_x = [iq*torque_const*gear_ratio for iq in i_q[i_start[i]:i_end[i]]]
-        tor_y = torque[i_start[i]:i_end[i]]
+        tor_x = [i*torque_const*gear_ratio for i in i_q_filt[i_start[i]:i_end[i]]]
+        tor_y = torque_filt[i_start[i]:i_end[i]]
         sx=statistics.stdev(tor_x)
         sy=statistics.stdev(tor_y)
         odr_data = odr.RealData(np.array(tor_x), np.array(tor_y), sx=sx, sy=sy)
@@ -177,7 +177,7 @@ def process(yaml_file, plot_all=False):
         tor_odr = [linear_func(odr_out.beta,x) for x in tor_x]
         nmsre = np.sqrt(np.mean(np.square([tor_y[v] - tor_odr[v] for v in range(0,len(tor_x))])))/(max(tor_y)-min(tor_y))
 
-        print(f"\tref: {v_ref[i]:5.2f} rad/s-> fit slope: {odr_out.beta[0]:6.3f} with NMSRE:{nmsre:6.3f}")
+        print(f"    ref: {v_ref[i]:5.2f} rad/s-> fit slope: {odr_out.beta[0]:6.3f} with NMSRE:{nmsre:6.3f}")
         axs[id,i%2].plot( tor_x,
                           tor_y,
                           marker='.',
@@ -190,7 +190,8 @@ def process(yaml_file, plot_all=False):
                           marker='',
                           linestyle="--",
                           color='#ff7f0e',
-                          label=f'model')
+                          label=f'model',
+                          zorder=1)
         # l0 = axs.plot(i_fb, motor_vel, color='#1f77b4', marker='.', markersize=0.2, linestyle="",  label='current out fb (A)')
         # l1 = axs.plot(i_q,  motor_vel, color='#1e1e1e', marker='.', markersize=0.2, linestyle="-", label='current reference (A)')
         # l2 = axs.plot(i_fb, motor_vel, color='#2ca02c', marker='.', markersize=0.2, linestyle=":", label='current ref fb (A)')
@@ -200,9 +201,9 @@ def process(yaml_file, plot_all=False):
 
         # make plot pretty
         if id == int(len(i_start)/2)-1:
-            axs[id,i%2].set_xlabel('current*Kt*N (Nm/rad)')
+            axs[id,i%2].set_xlabel('current*Kt*N (Nm)')
         if i%2 == 0:
-            axs[id,i%2].set_ylabel('motor torque (Nm)')
+            axs[id,i%2].set_ylabel('sensor reading (Nm)')
         # plt_max = (max(i_q) -min(i_q)) * torque_const * 0.05
         # axs[id,i%2].set_xlim(min(i_q)*torque_const-plt_max, max(i_q)*torque_const+plt_max)
         plt_max = (max(torque) -min(torque)) * 0.05
