@@ -53,7 +53,9 @@ def process(log_file, plot_all=False):
     l0 = axs.plot(ns, pos_ref, color='#2ca02c', marker='.', markersize=0.2, linestyle="-", label='Reference')
     l1 = axs.plot(ns, link_pos, color='#1f77b4', marker='.', markersize=0.2, linestyle="--", label='link_pos')
     l2 = axs.plot(ns, motor_pos, color='#ff7f0e', marker='.', markersize=0.2, linestyle=":", label='motor_pos')
-    axs.legend()
+    lgnd=axs.legend()
+    for handle in lgnd.legendHandles:
+        handle._legmarker.set_markersize(6)
 
     # make plot pretty
     axs.set_xlabel('Time (ns)')
@@ -76,7 +78,9 @@ def process(log_file, plot_all=False):
     fig, axs = plt.subplots()
     l1 = axs.plot(ns,  link_vel, color='#1f77b4', marker='.', markersize=0.2, label='link_vel')
     l2 = axs.plot(ns,  motor_vel, color='#ff7f0e', marker='.', markersize=0.2, linestyle="", label='motor_vel')
-    axs.legend()
+    lgnd=axs.legend()
+    for handle in lgnd.legendHandles:
+        handle._legmarker.set_markersize(6)
 
     # make plot pretty
     axs.set_xlabel('Time (ns)')
@@ -120,7 +124,9 @@ def process(log_file, plot_all=False):
     fig, axs = plt.subplots()
     l1 = axs.plot(ns,  temp1, color='#1f77b4', marker='.', markersize=0.2, linestyle="", label='temp1')
     l2 = axs.plot(ns,  temp2, color='#ff7f0e', marker='.', markersize=0.2, linestyle="", label='temp2')
-    axs.legend()
+    lgnd=axs.legend()
+    for handle in lgnd.legendHandles:
+        handle._legmarker.set_markersize(6)
 
     # make plot pretty
     axs.set_xlabel('Time (ns)')
