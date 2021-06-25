@@ -78,11 +78,137 @@ def process(yaml_file, plot_all=False):
 
     print(f'[i] Processing data (loaded {len(ns)} points)')
 
+    ## vel vs time --------------------------------------------------------------------------------------------------------------
+    fig, axs = plt.subplots(2)
+    l2 = axs[0].plot([s/1e9 for s in ns[0:10000]], motor_vel[0:10000], color='#1f77b4', marker='.', markersize=0.2, linestyle="", label='motor vel (rad/s)')
+    l3 = axs[1].plot([s/1e9 for s in ns], motor_vel, color='#1f77b4', marker='.', markersize=0.2, linestyle="", label='motor vel (rad/s)')
+
+    # make plot pretty
+    axs[0].set_xlabel('Time (s)')
+    axs[1].set_xlabel('Time (s)')
+    axs[0].set_ylabel('motor vel (rad/s)')
+    axs[1].set_ylabel('motor vel (rad/s)')
+
+    if len(ns)>10000:
+        axs[0].set_xlim(ns[0]/1e9, ns[10000]/1e9)# first 15s
+    else:
+        axs[0].set_xlim(ns[0]/1e9, ns[-1]/1e9)
+    axs[1].set_xlim(ns[0]/1e9, ns[-1]/1e9)
+
+    plt_max = (max(motor_vel) -min(motor_vel)) * 0.05
+    axs[1].set_ylim(min(motor_vel)-plt_max,max(motor_vel)+plt_max)
+    plt_max = (max(motor_vel[0:10000]) -min(motor_vel[0:10000])) * 0.05
+    axs[0].set_ylim(min(motor_vel[0:10000])-plt_max,max(motor_vel[0:10000])+plt_max)
+
+    axs[0].grid(b=True, which='major', axis='x', linestyle=':')
+    axs[0].grid(b=True, which='major', axis='y', linestyle='-')
+    axs[0].grid(b=True, which='minor', axis='y', linestyle=':')
+    axs[1].grid(b=True, which='major', axis='x', linestyle=':')
+    axs[1].grid(b=True, which='major', axis='y', linestyle='-')
+    axs[1].grid(b=True, which='minor', axis='y', linestyle=':')
+
+    axs[0].spines['top'].set_visible(False)
+    axs[0].spines['right'].set_visible(False)
+    axs[1].spines['top'].set_visible(False)
+    axs[1].spines['right'].set_visible(False)
+
+    # Save the graph
+    plt.tight_layout()
+    fig_name = image_base_path + '_0.png'
+    plt.savefig(fname=fig_name, format='png')
+    print('[i] Saved graph as: ' + fig_name)
+    if plot_all:
+        plt.show()
+
+    ## vel vs time --------------------------------------------------------------------------------------------------------------
+    fig, axs = plt.subplots()
+    l3 = axs.plot([s/1e9 for s in ns], motor_vel, color='#1f77b4', marker='.', markersize=0.2, linestyle="", label='motor vel (rad/s)')
+
+    # make plot pretty
+    axs.set_xlabel('Time (s)')
+    axs.set_ylabel('motor vel (rad/s)')
+
+    axs.set_xlim(ns[0]/1e9, ns[-1]/1e9)
+
+    plt_max = (max(motor_vel) -min(motor_vel)) * 0.05
+    axs.set_ylim(min(motor_vel)-plt_max,max(motor_vel)+plt_max)
+
+    axs.grid(b=True, which='major', axis='x', linestyle=':')
+    axs.grid(b=True, which='major', axis='y', linestyle='-')
+    axs.grid(b=True, which='minor', axis='y', linestyle=':')
+
+    axs.spines['top'].set_visible(False)
+    axs.spines['right'].set_visible(False)
+
+    # Save the graph
+    plt.tight_layout()
+    fig_name = image_base_path + '_0a.png'
+    plt.savefig(fname=fig_name, format='png')
+    print('[i] Saved graph as: ' + fig_name)
+    if plot_all:
+        plt.show()
+
+    ## vel vs time --------------------------------------------------------------------------------------------------------------
+    fig, axs = plt.subplots()
+    l2 = axs.plot([s/1e9 for s in ns[0:10000]], motor_vel[0:10000], color='#1f77b4', marker='.', markersize=0.2, linestyle="", label='motor vel (rad/s)')
+
+    # make plot pretty
+    axs.set_xlabel('Time (s)')
+    axs.set_ylabel('motor vel (rad/s)')
+
+    axs.set_xlim(ns[0]/1e9, ns[10000]/1e9)# first 15s
+    plt_max = (max(motor_vel[0:10000]) -min(motor_vel[0:10000])) * 0.05
+    axs.set_ylim(min(motor_vel[0:10000])-plt_max,max(motor_vel[0:10000])+plt_max)
+
+    axs.grid(b=True, which='major', axis='x', linestyle=':')
+    axs.grid(b=True, which='major', axis='y', linestyle='-')
+    axs.grid(b=True, which='minor', axis='y', linestyle=':')
+
+    axs.spines['top'].set_visible(False)
+    axs.spines['right'].set_visible(False)
+
+    # Save the graph
+    plt.tight_layout()
+    fig_name = image_base_path + '_0b.png'
+    plt.savefig(fname=fig_name, format='png')
+    print('[i] Saved graph as: ' + fig_name)
+    if plot_all:
+        plt.show()
+
+    ## cur vs time --------------------------------------------------------------------------------------------------------------
+    fig, axs = plt.subplots()
+    l2 = axs.plot([s/1e9 for s in ns[0:10000]], i_fb[0:10000], marker='.', markersize=0.4, linestyle="", label='current_out_fb (A)')
+    lgnd = axs.legend(loc='lower left')
+    for handle in lgnd.legendHandles:
+        handle._legmarker.set_markersize(6)
+    # make plot pretty
+    axs.set_xlabel('Time (s)')
+    axs.set_ylabel('Current (A)')
+
+    axs.set_xlim(ns[0]/1e9, ns[10000]/1e9)# first 15s
+    plt_max = (max(i_fb[0:10000]) -min(i_fb[0:10000])) * 0.05
+    axs.set_ylim(min(i_fb[0:10000])-plt_max,max(i_fb[0:10000])+plt_max)
+
+    axs.grid(b=True, which='major', axis='x', linestyle=':')
+    axs.grid(b=True, which='major', axis='y', linestyle='-')
+    axs.grid(b=True, which='minor', axis='y', linestyle=':')
+
+    axs.spines['top'].set_visible(False)
+    axs.spines['right'].set_visible(False)
+
+    # Save the graph
+    plt.tight_layout()
+    fig_name = image_base_path + '_0c.png'
+    plt.savefig(fname=fig_name, format='png')
+    print('[i] Saved graph as: ' + fig_name)
+    if plot_all:
+        plt.show()
+
     ## tor vs time --------------------------------------------------------------------------------------------------------------
     fig, axs = plt.subplots(2)
     l0 = axs[0].plot([s/1e9 for s in ns[0:10000]], i_fb[0:10000], color='#8e8e8e', marker='.', markersize=0.2, linestyle="", label='current_out_fb (A)')
-    l1 = axs[0].plot([s/1e9 for s in ns[0:10000]], ref_tor[0:10000], color='#1e1e1e', marker='.', markersize=0.2, linestyle="", label='Torque reference (Nm)')
-    l2 = axs[0].plot([s/1e9 for s in ns[0:10000]], motor_tor[0:10000], color='#1f77b4', marker='.', markersize=0.2, linestyle="", label='Torque readings (Nm)')
+    l1 = axs[0].plot([s/1e9 for s in ns[0:10000]], ref_tor[0:10000], color='#1e1e1e', marker='.', markersize=0.2, linestyle="-", label='Torque reference (Nm)')
+    l2 = axs[0].plot([s/1e9 for s in ns[0:10000]], motor_tor[0:10000], color='#1f77b4', marker='.', markersize=0.2, linestyle="-", label='Torque readings (Nm)')
 
 
     l3 = axs[1].plot([s/1e9 for s in ns], motor_tor, color='#1f77b4', marker='.', markersize=0.2, linestyle="", label='motor torque (Nm)')
