@@ -5,6 +5,7 @@ import os
 import sys
 import yaml
 import numpy as np
+
 # tell matplotlib not to try to load up GTK as it returns errors over ssh
 from matplotlib import use as plt_use
 plt_use("Agg")

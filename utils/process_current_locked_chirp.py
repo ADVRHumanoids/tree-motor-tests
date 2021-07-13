@@ -8,6 +8,7 @@ import math
 import numpy as np
 from scipy import signal
 from scipy.optimize import leastsq
+
 # tell matplotlib not to try to load up GTK as it returns errors over ssh
 from matplotlib import use as plt_use
 plt_use("Agg")
