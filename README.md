@@ -19,7 +19,7 @@
   <p align="center">
     A set of tests to evaluate new actuators
     <br />
-    <a href="https://github.com/ADVRHumanoids/tree-motor-tests"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/ADVRHumanoids/tree-motor-tests/wiki"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <!-- <a href="https://github.com/ADVRHumanoids/tree-motor-tests">View Demo</a>
@@ -297,7 +297,7 @@ The only exceptions to this naming convention are `test-pdo` and `test-phase`.
 
 ## Documentation
 
-Documentation can be found in the [Github Wiki page](git@github.com:ADVRHumanoids/tree-motor-tests.git).
+Documentation can be found in the [Github Wiki page](https://github.com/ADVRHumanoids/tree-motor-tests/wiki).
 
 ## Roadmap
 
