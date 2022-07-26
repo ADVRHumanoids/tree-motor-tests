@@ -253,4 +253,10 @@ def process(log_file, plot_all=False):
 
 
 if __name__ == "__main__":
-    process(log_file=sys.argv[1], plot_all=False)
+    import argparse
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('logfile', type=str, help='log file path')
+    parser.add_argument('--interactive', '-i', required=False, action='store_true', help='interactive plots')
+    args = parser.parse_args()
+
+    process(log_file=args.logfile, plot_all=args.interactive)
